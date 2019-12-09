@@ -162,6 +162,14 @@ cgminer_SOURCES += driver-spondoolies-sp30.c driver-spondoolies-sp30.h \
 		   driver-spondoolies-sp30-p.c driver-spondoolies-sp30-p.h
 endif
 
+
+
+if HAS_CHAINREACTION
+cgminer_SOURCES += driver-chainreaction.c driver-chainreaction.h \
+		   driver-chainreaction-p.c driver-chainreaction-p.h
+endif
+
+
 if HAS_BAB
 cgminer_SOURCES += driver-bab.c
 endif

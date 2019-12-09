@@ -546,6 +546,21 @@ fi
 AM_CONDITIONAL([HAS_SP30], [test x$sp30 = xyes])
 
 
+
+chainreaction="no"
+
+AC_ARG_ENABLE([chainreaction],
+	[AC_HELP_STRING([--enable-chainreaction],[Compile support for Chainreaction(default disabled)])],
+	[chainreaction=$enableval]
+	)
+if test "x$chainreaction" = xyes; then
+	AC_DEFINE([USE_CHAINREACTION], [1], [Defined to 1 if CHAINREACTION support is wanted])
+	drivercount=x$drivercount
+	standalone="yes"
+fi
+AM_CONDITIONAL([HAS_CHAINREACTION], [test x$chainreaction = xyes])
+
+
 forcecombo="no"
 
 AC_ARG_ENABLE([forcecombo],
@@ -978,8 +993,15 @@ else
 	echo "  ModMiner.FPGAs.......: Disabled"
 fi
 
+
+if test "x$chainreaction" = xyes; then
+	echo "  Chainreaction........: Enabled"
+else
+	echo "  Chainreaction........: Disabled"
+fi
+
 #Add any new device to this, along with a no on the end of the test
-if test "x$avalon$avalon2$avalon4$avalon7$avalon8$avalon_miner$bab$bflsc$bitforce$bitfury$bitfury16$bitmain_soc$blockerupter$hashfast$hashratio$icarus$klondike$knc$modminer$drillbit$minion$cointerra$bitmine_A1$ants1$ants2$ants3$sp10$sp30$dragonmint_t1" = xnononononononononononononononononononononononononononono; then
+if test "x$avalon$avalon2$avalon4$avalon7$avalon8$avalon_miner$bab$bflsc$bitforce$bitfury$bitfury16$bitmain_soc$blockerupter$hashfast$hashratio$icarus$klondike$knc$modminer$drillbit$minion$cointerra$bitmine_A1$ants1$ants2$ants3$sp10$sp30$dragonmint_t1$chainreaction" = xnonononononononononononononononononononononononononononono; then
 	echo
 	AC_MSG_ERROR([No mining devices configured in])
 	echo

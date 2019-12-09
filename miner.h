@@ -268,6 +268,7 @@ static inline int fsync (int fd)
 	DRIVER_ADD_COMMAND(minion) \
 	DRIVER_ADD_COMMAND(sp10) \
 	DRIVER_ADD_COMMAND(sp30) \
+    DRIVER_ADD_COMMAND(chainreaction) \
 	DRIVER_ADD_COMMAND(bitmain_soc)
 
 #define DRIVER_PARSE_COMMANDS(DRIVER_ADD_COMMAND) \

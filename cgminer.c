@@ -106,6 +106,10 @@ char *curly = ":D";
 #include "driver-spondoolies-sp30.h"
 #endif
 
+#ifdef USE_CHAINREACTION
+#include "driver-chainreaction.h"
+#endif
+
 #ifdef USE_BLOCK_ERUPTER
 #include "driver-blockerupter.h"
 #endif
@@ -2530,6 +2534,9 @@ static char *opt_verusage_and_exit(const char *extra)
 #endif
 #ifdef USE_SP30
         "sp30 "
+#endif
+#ifdef USE_CHAINREACTION
+        "chainreaction "
 #endif
 
 		"mining support.\n"
