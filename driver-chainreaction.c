@@ -39,6 +39,8 @@
 #include "driver-chainreaction-p.h"
 #include "driver-chainreaction.h"
 
+#define zp(...) fprintf (stderr, __VA_ARGS__)
+
 #ifdef WORDS_BIGENDIAN
 #  define swap32tobe(out, in, sz)  ((out == in) ? (void)0 : memmove(out, in, sz))
 #  define LOCAL_swap32be(type, var, sz)  ;
@@ -96,7 +98,7 @@ static int init_socket(void)
 
 	socket_fd = socket(PF_UNIX, SOCK_STREAM, 0);
 	if (socket_fd < 0) {
-		applog(LOG_ERR, "SP30: socket error: %s", strerror(errno));
+		applog(LOG_ERR, "ChainReaction: socket error: %s", strerror(errno));
 		return 0;
 	}
 
@@ -107,7 +109,7 @@ static int init_socket(void)
 	sprintf(address.sun_path, REACTIONGATE_SOCKET_FILE);
 
 	if (connect(socket_fd, (struct sockaddr *) &address, sizeof(struct sockaddr_un))) {
-		applog(LOG_ERR, "SP30: socket connect error: %s", strerror(errno));
+		applog(LOG_ERR, "ChainReaction: socket connect error: %s", strerror(errno));
 		return 0;
 	}
 
@@ -120,11 +122,11 @@ static bool chainreaction_flush_queue(struct react_adapter* a, bool flush_queue)
 		static int i = 0;
 
 		if (i++ % 10 == 0 && a->works_in_reactiongate_and_pending_tx + a->works_pending_tx != a->works_in_driver)
-			applog(LOG_DEBUG, "SP30: %d + %d != %d", a->works_in_reactiongate_and_pending_tx, a->works_pending_tx,a->works_in_driver);
+			applog(LOG_DEBUG, "ChainReaction: %d + %d != %d", a->works_in_reactiongate_and_pending_tx, a->works_pending_tx,a->works_in_driver);
 		assert(a->works_in_reactiongate_and_pending_tx + a->works_pending_tx == a->works_in_driver);
 		send_reactiongate_pkt(a->mp_next_req,  a->mp_last_rsp, a->socket_fd);
 		if (flush_queue) {
-			applog(LOG_DEBUG, "SP30: FLUSH!");
+			applog(LOG_DEBUG, "ChainReaction: FLUSH!");
 			a->mp_next_req->mask |= 0x02;
 		} else {
 			a->mp_next_req->mask &= ~0x02;
@@ -141,9 +143,8 @@ static bool chainreaction_flush_queue(struct react_adapter* a, bool flush_queue)
 static void chainreaction_detect(__maybe_unused bool hotplug)
 {
 	struct cgpu_info *cgpu = calloc(1, sizeof(*cgpu));
-	struct device_drv *drv = &sp30_drv;
+	struct device_drv *drv = &chainreaction_drv;
 	struct react_adapter *a;
-
 #if NEED_FIX
 	nDevs = 1;
 #endif
@@ -153,7 +154,7 @@ static void chainreaction_detect(__maybe_unused bool hotplug)
 	cgpu->deven = DEV_ENABLED;
 	cgpu->threads = 1;
 	cgpu->device_data = calloc(sizeof(struct react_adapter), 1);
-	if (unlikely(!(cgpu->device_data)))
+	if (!(cgpu->device_data))
 		quit(1, "Failed to calloc cgpu_info data");
 	a = cgpu->device_data;
 	a->cgpu = (void *)cgpu;
@@ -164,7 +165,7 @@ static void chainreaction_detect(__maybe_unused bool hotplug)
 	pthread_mutex_init(&a->lock, NULL);
 	a->socket_fd = init_socket();
 	if (a->socket_fd < 1) {
-		applog(LOG_ERR, "SP30: Failed to connect to reactiongate server");
+		applog(LOG_ERR, "ChainReaction: Error: failed to connect to reactiongate server, quiting");
 		_quit(-1);
 	}
 
@@ -173,7 +174,7 @@ static void chainreaction_detect(__maybe_unused bool hotplug)
 	chainreaction_flush_queue(a, true);
 	chainreaction_flush_queue(a, true);
 	chainreaction_flush_queue(a, true);
-	applog(LOG_DEBUG, "SP30: REACT chainreaction_detect done");
+	applog(LOG_DEBUG, "ReactionGate: chainreaction_detect done");
 }
 
 static struct api_data *chainreaction_api_stats(struct cgpu_info *cgpu)
@@ -224,6 +225,7 @@ static void fill_reactiongate_request(reactiongate_do_job_req* work, struct work
 	uint32_t x[64 / 4];
 	uint64_t wd;
 
+    zp("%s %d\n", __FUNCTION__, __LINE__);
 	memset(work, 0, sizeof(reactiongate_do_job_req));
 	//work->
 	LOCAL_swap32le(unsigned char, cg_work->midstate, 32 / 4)
@@ -358,6 +360,7 @@ return_unlock:
 
 static void react_poll_stats(struct cgpu_info *react, struct react_adapter *a)
 {
+    zp("%s %d\n", __FUNCTION__, __LINE__);
 	FILE *fp = fopen("/var/run/rg_rate_temp", "r");
 
 	if (!fp) {
@@ -384,6 +387,7 @@ static int64_t react_scanhash(struct thr_info *thr)
 	int64_t ghashes = 0;
 	cgtimer_t cgt;
 	time_t now_t;
+    zp("%s %d\n", __FUNCTION__, __LINE__);
 
 	cgsleep_prepare_r(&cgt);
 	now_t = time(NULL);
@@ -456,7 +460,7 @@ static int64_t react_scanhash(struct thr_info *thr)
 static void react_flush_work(struct cgpu_info *cgpu)
 {
 	struct react_adapter *a = cgpu->device_data;
-
+    zp("%s %d\n", __FUNCTION__, __LINE__);
 	//printf("GOT FLUSH!%d\n");
 	mutex_lock(&a->lock);
 	a->reset_mg_queue = 3;

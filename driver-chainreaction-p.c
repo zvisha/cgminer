@@ -33,7 +33,6 @@ reactiongate_req_packet *allocate_reactiongate_packet_req(uint8_t requester_id,
 
 reactiongate_rsp_packet *allocate_reactiongate_packet_rsp(uint8_t requester_id,
                                                     uint8_t request_id) {
-
   reactiongate_rsp_packet *p = cgmalloc(sizeof(reactiongate_rsp_packet));
   p->requester_id = requester_id;
   p->rsp_count = 0;
