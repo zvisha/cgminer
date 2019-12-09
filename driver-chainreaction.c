@@ -10,7 +10,7 @@
 
 /*
  This driver communicates the job requests via Unix socket to the reactiongate
- process, that is responsible for controlling the Chainreaction Dawson SP10 miner.
+ process, that is responsible for controlling the Chainreaction miner.
 
  The jobs sent each with unique ID and returned asynchronously in one of the next
  transactions. REQUEST_PERIOD and REQUEST_SIZE define the communication rate with reactiongate.
